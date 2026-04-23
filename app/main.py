@@ -1,13 +1,20 @@
-from fastapi.testclient import TestClient
-from app.main import app
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-client = TestClient(app)
+app = FastAPI(title="Minha API", version="1.0.0")
 
-def test_root():
-  res = client.get("/")
-  assert res.status_code == 200
-  assert res.json()["status"] == "ok"
+class Item(BaseModel):
+  name: str
+  price: float
+  
+@app.get("/")
+  async def root():
+  return {"status": "ok", "message": "API rodando!"}
 
-def test_health():
-  res = client.get("/health")
-  assert res.status_code == 200
+@app.get("/health")
+  async def health():
+  return {"status": "healthy"}
+
+@app.post("/items")
+  async def create_item(item: Item):
+  return {"created": item}
